@@ -36,12 +36,13 @@ def getOrCreateBrand(brandName, client, url):
             "name": brandName,
             "followers": [],
             "banner": "",
-            "profile_picture": "",
+            "profile_picture": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" + url + "&size=128",
             "url": url
         }
         brands.insert_one(brand)
         print("Created brand")
-        getOrCreateBrand(brandName, client, url)
+        brand = brands.find_one({"name": brandName})
+        return brand['_id']
 
 def getProducts(url):
     index = 1
@@ -116,7 +117,7 @@ if __name__ == '__main__':
         currency = sys.argv[3]
         mongo_uri = sys.argv[4]
         client = connectToDB(mongo_uri)
-        brandId = getOrCreateBrand(storeName, client, url)
+        brand = getOrCreateBrand(storeName, client, url)
         products = getProducts(url)
-        relevantProducts = getRelevantProducts(products, storeName, brandId, currency, url)
+        relevantProducts = getRelevantProducts(products, storeName, brand['_id'], currency, url)
         insertProducts(relevantProducts, client)
